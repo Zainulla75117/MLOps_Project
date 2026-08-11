@@ -1,0 +1,75 @@
+# ========================
+# Bengaluru Traffic MLOps
+# ========================
+
+project:
+  name: "bengaluru-traffic-mlops"
+  version: "1.0.0"
+  description: "Traffic Volume Prediction for Bengaluru"
+
+# ---------- Data ----------
+data:
+  raw_path: "dataset/Banglore_traffic_Dataset.csv"
+  processed_dir: "data/processed"
+  test_size: 0.2
+  random_state: 42
+  target_column: "Traffic Volume"
+  drop_columns:
+    - "Environmental Impact"   # perfect correlation → data leak
+
+# ---------- Feature Engineering ----------
+features:
+  categorical:
+    - "Area Name"
+    - "Road/Intersection Name"
+    - "Weather Conditions"
+  binary:
+    - "Roadwork and Construction Activity"
+  time_features:
+    - "year"
+    - "month"
+    - "day_of_week"
+    - "day_of_month"
+    - "is_weekend"
+  rolling_windows: [7, 30]
+  lag_periods: [1, 3, 7]
+
+# ---------- Training ----------
+training:
+  models:
+    - "linear_regression"
+    - "random_forest"
+    - "xgboost"
+    - "lightgbm"
+  cv_folds: 5
+  metrics:
+    - "rmse"
+    - "mae"
+    - "r2"
+    - "mape"
+  optuna_trials: 50
+
+# ---------- MLflow ----------
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  experiment_name: "bengaluru-traffic"
+  registry_name: "traffic-volume-model"
+
+# ---------- Serving ----------
+serving:
+  host: "0.0.0.0"
+  port: 8000
+  model_stage: "Production"
+
+# ---------- Monitoring ----------
+monitoring:
+  drift_report_dir: "reports/drift"
+  reference_data_path: "data/processed/train.csv"
+  drift_threshold: 0.05
+
+# ---------- AWS ----------
+aws:
+  region: "ap-south-1"
+  ecr_repository: "bengaluru-traffic-mlops"
+  s3_bucket: "bengaluru-traffic-mlops-artifacts"
+  eks_cluster_name: "traffic-mlops-cluster"

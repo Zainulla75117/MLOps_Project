@@ -1,0 +1,10 @@
+# ==================================================
+# ConfigMap for Traffic API
+# ==================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traffic-api-config
+  namespace: mlops
+data:
+  MLFLOW_TRACKING_URI: "http://mlflow-service.mlops.svc.cluster.local:5000"

@@ -1,0 +1,187 @@
+# ==============================================================
+# CI/CD Pipeline — Bengaluru Traffic MLOps
+# ==============================================================
+# Triggers:
+#   PR → Lint + Test + Data Validation
+#   Push to main → Retrain + Evaluate + Build + Push to ECR
+#   Tag → Deploy to EKS
+# ==============================================================
+
+name: MLOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: bengaluru-traffic-mlops
+  EKS_CLUSTER_NAME: traffic-mlops-cluster
+
+permissions:
+  contents: read
+
+jobs:
+  # ========================================
+  # Stage 1: Lint & Test (on every PR/push)
+  # ========================================
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8 black isort
+
+      - name: Lint with flake8
+        run: |
+          flake8 src/ tests/ --max-line-length=120 --ignore=E203,W503
+
+      - name: Check formatting
+        run: |
+          black --check src/ tests/
+          isort --check-only src/ tests/
+
+      - name: Run unit tests
+        run: |
+          pytest tests/ -v --cov=src --cov-report=xml
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+  # ========================================
+  # Stage 2: Train & Evaluate (on main push)
+  # ========================================
+  train-and-evaluate:
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run preprocessing
+        run: python -m src.data_preprocessing
+
+      - name: Run training pipeline
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+        run: python -m src.train
+
+      - name: Run evaluation
+        run: python -m src.evaluate
+
+      - name: Run drift monitoring
+        run: python -m src.monitor
+
+      - name: Upload model artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-artifacts
+          path: |
+            models/
+            data/processed/
+            reports/
+
+  # ========================================
+  # Stage 3: Build & Push Docker Image
+  # ========================================
+  build-and-push:
+    needs: train-and-evaluate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download model artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: model-artifacts
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker meta
+        id: meta
+        run: |
+          ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG="${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA::7}"
+          LATEST_TAG="${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+          echo "tags=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "latest=${LATEST_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        run: |
+          docker build --target server -t ${{ steps.meta.outputs.tags }} -t ${{ steps.meta.outputs.latest }} .
+          docker push ${{ steps.meta.outputs.tags }}
+          docker push ${{ steps.meta.outputs.latest }}
+
+  # ========================================
+  # Stage 4: Deploy to EKS (on tag)
+  # ========================================
+  deploy:
+    needs: build-and-push
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Deploy to EKS
+        run: |
+          ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA::7}"
+
+          # Update image in k8s manifests
+          sed -i "s|IMAGE_PLACEHOLDER|${IMAGE}|g" k8s/deployment.yaml
+
+          kubectl apply -f k8s/
+          kubectl rollout status deployment/traffic-api -n mlops --timeout=300s

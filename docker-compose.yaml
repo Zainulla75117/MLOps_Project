@@ -1,0 +1,69 @@
+# ================================================
+# Docker Compose — Bengaluru Traffic MLOps
+# ================================================
+# Services: FastAPI server, MLflow tracking server
+# ================================================
+
+services:
+  # ---------- FastAPI Prediction Service ----------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: server
+    container_name: traffic-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+      - ./data/processed:/app/data/processed
+      - ./configs:/app/configs
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - mlflow
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ---------- MLflow Tracking Server ----------
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.19.0
+    container_name: traffic-mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:///mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+    restart: unless-stopped
+
+  # ---------- Training Job (run on-demand) ----------
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: trainer
+    container_name: traffic-trainer
+    volumes:
+      - ./dataset:/app/dataset
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./configs:/app/configs
+      - ./reports:/app/reports
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - mlflow
+    profiles:
+      - training
+
+volumes:
+  mlflow_data:
