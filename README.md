@@ -2,7 +2,7 @@
 
 End-to-end MLOps pipeline for predicting traffic volume across Bengaluru's major roads and intersections.
 
-## 🏗 Architecture
+## Architecture
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
@@ -17,7 +17,7 @@ End-to-end MLOps pipeline for predicting traffic volume across Bengaluru's major
 └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
 ```
 
-## 📊 Dataset
+## Dataset
 
 | Property | Value |
 |----------|-------|
@@ -28,7 +28,7 @@ End-to-end MLOps pipeline for predicting traffic volume across Bengaluru's major
 | Date Range | 2022-01-01 → 2024-08-09 |
 | Areas Covered | Koramangala, M.G. Road, Indiranagar, Hebbal, Jayanagar, Whitefield, Yeshwanthpur, Electronic City |
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.10+
@@ -79,7 +79,7 @@ dvc metrics show   # Show metrics
 dvc plots show     # Show plots
 ```
 
-## 🏭 Infrastructure (Terraform)
+## Infrastructure (Terraform)
 
 Provisions on AWS `ap-south-1`:
 - **VPC** — Public/private subnets across 2 AZs, NAT gateways
@@ -94,7 +94,7 @@ terraform plan -out=plan.out
 terraform apply plan.out
 ```
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 ├── src/
@@ -128,7 +128,7 @@ terraform apply plan.out
 └── requirements.txt
 ```
 
-## 🔌 API Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -160,7 +160,7 @@ curl -X POST http://localhost:8000/predict \
   }'
 ```
 
-## 🔄 CI/CD Pipeline
+## CI/CD Pipeline
 
 | Trigger | Stage | Actions |
 |---------|-------|---------|
@@ -168,7 +168,7 @@ curl -X POST http://localhost:8000/predict \
 | Push to `main` | Train & Build | Retrain model → Build Docker → Push to ECR |
 | Tag `v*` | Deploy | Deploy to EKS via `kubectl apply` |
 
-## 📈 Models
+## Models
 
 - **Baseline**: Linear Regression
 - **Random Forest** (Optuna-tuned)
@@ -177,7 +177,7 @@ curl -X POST http://localhost:8000/predict \
 
 Best model selected by test RMSE, tracked in MLflow.
 
-## 🔍 Monitoring
+## Monitoring
 
 Data drift detection using **Evidently AI**:
 - Dataset drift report
