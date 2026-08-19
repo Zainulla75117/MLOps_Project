@@ -32,7 +32,7 @@ resource "aws_iam_role_policy_attachment" "eks_vpc_resource_controller" {
 
 # ---------- EKS Cluster ----------
 resource "aws_eks_cluster" "main" {
-  name     = "${var.project_name}-${var.environment}"
+  name     = "mlops-cluster"
   version  = var.cluster_version
   role_arn = aws_iam_role.eks_cluster.arn
 

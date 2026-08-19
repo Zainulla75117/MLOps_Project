@@ -70,6 +70,6 @@ monitoring:
 # ---------- AWS ----------
 aws:
   region: "ap-south-1"
-  ecr_repository: "bengaluru-traffic-mlops"
+  ecr_repository: "mlops-cluster"
   s3_bucket: "bengaluru-traffic-mlops-artifacts"
-  eks_cluster_name: "traffic-mlops-cluster"
+  eks_cluster_name: "mlops-cluster"

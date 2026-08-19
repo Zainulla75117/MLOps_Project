@@ -5,17 +5,17 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/**'
+      - 'Bengaluru Traffic Analysis/terraform/**'
   pull_request:
     branches:
       - main
     paths:
-      - 'terraform/**'
+      - 'Bengaluru Traffic Analysis/terraform/**'
   workflow_dispatch:
 
 env:
   AWS_REGION: ap-south-1
-  TF_WORKING_DIR: './terraform'
+  TF_WORKING_DIR: './Bengaluru Traffic Analysis/terraform'
 
 jobs:
   terraform-plan:

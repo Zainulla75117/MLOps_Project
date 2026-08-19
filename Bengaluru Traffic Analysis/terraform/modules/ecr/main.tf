@@ -3,7 +3,7 @@
 # ============================================================
 
 resource "aws_ecr_repository" "main" {
-  name                 = "${var.project_name}-${var.environment}"
+  name                 = "mlops-cluster"
   image_tag_mutability = "MUTABLE"
   force_delete         = true
 
