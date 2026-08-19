@@ -14,14 +14,13 @@ terraform {
     }
   }
 
-  # Remote backend — uncomment and configure for team use
-  # backend "s3" {
-  #   bucket         = "bengaluru-traffic-tf-state"
-  #   key            = "infrastructure/terraform.tfstate"
-  #   region         = "ap-south-1"
-  #   dynamodb_table = "terraform-locks"
-  #   encrypt        = true
-  # }
+  backend "s3" {
+    bucket         = "mlops-cluster-tf-state"
+    key            = "infrastructure/terraform.tfstate"
+    region         = "ap-south-1"
+    dynamodb_table = "mlops-cluster-tf-locks"
+    encrypt        = true
+  }
 }
 
 provider "aws" {
