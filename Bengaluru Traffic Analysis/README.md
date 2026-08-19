@@ -34,7 +34,7 @@ End-to-end MLOps pipeline for predicting traffic volume across Bengaluru's major
 - Python 3.10+
 - Docker & Docker Compose
 - AWS CLI (configured)
-- Terraform >= 1.5
+- Terraform >= 1.15.8
 
 ### Local Development
 
@@ -83,7 +83,7 @@ dvc plots show     # Show plots
 
 Provisions on AWS `ap-south-1`:
 - **VPC** — Public/private subnets across 2 AZs, NAT gateways
-- **EKS** — Kubernetes 1.30 with managed node group (t3.medium)
+- **EKS** — Kubernetes 1.36 with managed node group (t3.small)
 - **ECR** — Container registry with image scanning
 - **S3** — MLflow artifacts + DVC remote (encrypted, versioned)
 
