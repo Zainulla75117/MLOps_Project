@@ -46,6 +46,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "mlflow_artifacts" {
     id     = "transition-old-artifacts"
     status = "Enabled"
 
+    filter {}
+
     transition {
       days          = 90
       storage_class = "STANDARD_IA"
