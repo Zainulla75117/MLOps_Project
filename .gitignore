@@ -1,0 +1,35 @@
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Terraform
+Infrastructure/terraform/.terraform/
+Infrastructure/terraform/*.tfstate
+Infrastructure/terraform/*.tfstate.backup
+Infrastructure/terraform/*.tfplan
+Infrastructure/terraform/plan.out
+.terraform.lock.hcl
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+.venv/
+env/
+.ipynb_checkpoints/
