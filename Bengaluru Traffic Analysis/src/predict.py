@@ -27,38 +27,20 @@ logger = logging.getLogger(__name__)
 class TrafficFeatures(BaseModel):
     """Input features for traffic volume prediction."""
 
-    date: str = Field(
-        ..., description="Date in YYYY-MM-DD format", examples=["2024-06-15"]
-    )
+    date: str = Field(..., description="Date in YYYY-MM-DD format", examples=["2024-06-15"])
     area_name: str = Field(..., description="Area name", examples=["Koramangala"])
-    road_name: str = Field(
-        ..., description="Road/Intersection name", examples=["Sarjapur Road"]
-    )
+    road_name: str = Field(..., description="Road/Intersection name", examples=["Sarjapur Road"])
     average_speed: float = Field(..., ge=0, description="Average speed (km/h)")
     travel_time_index: float = Field(..., ge=1.0, description="Travel time index")
-    congestion_level: float = Field(
-        ..., ge=0, le=100, description="Congestion level (0-100)"
-    )
-    road_capacity_utilization: float = Field(
-        ..., ge=0, le=100, description="Road capacity utilization (%)"
-    )
+    congestion_level: float = Field(..., ge=0, le=100, description="Congestion level (0-100)")
+    road_capacity_utilization: float = Field(..., ge=0, le=100, description="Road capacity utilization (%)")
     incident_reports: int = Field(..., ge=0, description="Number of incident reports")
-    public_transport_usage: float = Field(
-        ..., ge=0, description="Public transport usage (%)"
-    )
-    traffic_signal_compliance: float = Field(
-        ..., ge=0, le=100, description="Traffic signal compliance (%)"
-    )
+    public_transport_usage: float = Field(..., ge=0, description="Public transport usage (%)")
+    traffic_signal_compliance: float = Field(..., ge=0, le=100, description="Traffic signal compliance (%)")
     parking_usage: float = Field(..., ge=0, le=100, description="Parking usage (%)")
-    pedestrian_cyclist_count: int = Field(
-        ..., ge=0, description="Pedestrian and cyclist count"
-    )
-    weather_conditions: str = Field(
-        ..., description="Weather conditions", examples=["Clear"]
-    )
-    roadwork_activity: str = Field(
-        ..., description="Roadwork and construction activity (Yes/No)", examples=["No"]
-    )
+    pedestrian_cyclist_count: int = Field(..., ge=0, description="Pedestrian and cyclist count")
+    weather_conditions: str = Field(..., description="Weather conditions", examples=["Clear"])
+    roadwork_activity: str = Field(..., description="Roadwork and construction activity (Yes/No)", examples=["No"])
 
 
 class PredictionResponse(BaseModel):
@@ -163,9 +145,7 @@ def _prepare_features(features: TrafficFeatures) -> np.ndarray:
         "Parking Usage": features.parking_usage,
         "Pedestrian and Cyclist Count": features.pedestrian_cyclist_count,
         "Weather Conditions": features.weather_conditions,
-        "Roadwork and Construction Activity": (
-            1 if features.roadwork_activity == "Yes" else 0
-        ),
+        "Roadwork and Construction Activity": (1 if features.roadwork_activity == "Yes" else 0),
     }
     df = pd.DataFrame([row])
     df["Date"] = pd.to_datetime(df["Date"])
@@ -180,9 +160,7 @@ def _prepare_features(features: TrafficFeatures) -> np.ndarray:
     df["week_of_year"] = df["Date"].dt.isocalendar().week.astype(int)
 
     # --- Interaction features ---
-    df["congestion_x_capacity"] = (
-        df["Congestion Level"] * df["Road Capacity Utilization"]
-    )
+    df["congestion_x_capacity"] = df["Congestion Level"] * df["Road Capacity Utilization"]
     df["speed_x_tti"] = df["Average Speed"] * df["Travel Time Index"]
     df["incident_density"] = df["Incident Reports"] / (df["Congestion Level"] + 1)
 
@@ -216,11 +194,7 @@ def _prepare_features(features: TrafficFeatures) -> np.ndarray:
     df = df[state.feature_cols]
 
     # Scale numeric features
-    numeric_cols = [
-        c
-        for c in state.feature_cols
-        if df[c].dtype in [np.float64, np.int64, np.float32, np.int32]
-    ]
+    numeric_cols = [c for c in state.feature_cols if df[c].dtype in [np.float64, np.int64, np.float32, np.int32]]
     if state.scaler is not None:
         cols_in_scaler = [c for c in numeric_cols if c in state.feature_cols]
         df[cols_in_scaler] = state.scaler.transform(df[cols_in_scaler])

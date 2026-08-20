@@ -86,9 +86,7 @@ def split_data(df: pd.DataFrame, config: dict) -> tuple[pd.DataFrame, pd.DataFra
     return train_df, test_df
 
 
-def save_processed_data(
-    train_df: pd.DataFrame, test_df: pd.DataFrame, output_dir: str
-) -> None:
+def save_processed_data(train_df: pd.DataFrame, test_df: pd.DataFrame, output_dir: str) -> None:
     """Save processed train and test sets to CSV."""
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)

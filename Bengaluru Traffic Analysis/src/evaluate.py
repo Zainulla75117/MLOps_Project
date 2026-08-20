@@ -32,17 +32,13 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
     return {"rmse": rmse, "mae": mae, "r2": r2, "mape": mape}
 
 
-def plot_predictions_vs_actual(
-    y_true: np.ndarray, y_pred: np.ndarray, title: str, save_path: str
-) -> None:
+def plot_predictions_vs_actual(y_true: np.ndarray, y_pred: np.ndarray, title: str, save_path: str) -> None:
     """Scatter plot of predicted vs actual values."""
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.scatter(y_true, y_pred, alpha=0.3, s=10)
     min_val = min(y_true.min(), y_pred.min())
     max_val = max(y_true.max(), y_pred.max())
-    ax.plot(
-        [min_val, max_val], [min_val, max_val], "r--", lw=2, label="Perfect Prediction"
-    )
+    ax.plot([min_val, max_val], [min_val, max_val], "r--", lw=2, label="Perfect Prediction")
     ax.set_xlabel("Actual Traffic Volume")
     ax.set_ylabel("Predicted Traffic Volume")
     ax.set_title(title)
@@ -53,9 +49,7 @@ def plot_predictions_vs_actual(
     logger.info("Saved prediction plot: %s", save_path)
 
 
-def plot_residuals(
-    y_true: np.ndarray, y_pred: np.ndarray, title: str, save_path: str
-) -> None:
+def plot_residuals(y_true: np.ndarray, y_pred: np.ndarray, title: str, save_path: str) -> None:
     """Residual distribution plot."""
     residuals = y_true - y_pred
 
@@ -81,9 +75,7 @@ def plot_residuals(
     logger.info("Saved residual plot: %s", save_path)
 
 
-def plot_feature_importance(
-    model, feature_names: list[str], title: str, save_path: str, top_n: int = 20
-) -> None:
+def plot_feature_importance(model, feature_names: list[str], title: str, save_path: str, top_n: int = 20) -> None:
     """Plot feature importance for tree-based models."""
     if hasattr(model, "feature_importances_"):
         importances = model.feature_importances_
@@ -192,14 +184,10 @@ if __name__ == "__main__":
         config = yaml.safe_load(f)
 
     model = joblib.load("models/best_model.joblib")
-    feature_cols = joblib.load(
-        Path(config["data"]["processed_dir"]) / "feature_cols.joblib"
-    )
+    feature_cols = joblib.load(Path(config["data"]["processed_dir"]) / "feature_cols.joblib")
 
     train_df, test_df = run_preprocessing("configs/config.yaml")
-    train_df, test_df, encoders, scaler = run_feature_engineering(
-        train_df, test_df, config
-    )
+    train_df, test_df, encoders, scaler = run_feature_engineering(train_df, test_df, config)
 
     target = config["data"]["target_column"]
     X_test = np.ascontiguousarray(test_df[feature_cols].values, dtype=np.float32)

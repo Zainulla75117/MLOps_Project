@@ -57,15 +57,11 @@ def _rf_objective(trial, X_train, y_train):
         "max_depth": trial.suggest_int("max_depth", 5, 30),
         "min_samples_split": trial.suggest_int("min_samples_split", 2, 20),
         "min_samples_leaf": trial.suggest_int("min_samples_leaf", 1, 10),
-        "max_features": trial.suggest_categorical(
-            "max_features", ["sqrt", "log2", None]
-        ),
+        "max_features": trial.suggest_categorical("max_features", ["sqrt", "log2", None]),
     }
     model = RandomForestRegressor(**params, random_state=42, n_jobs=-1)
     tscv = TimeSeriesSplit(n_splits=5)
-    scores = cross_val_score(
-        model, X_train, y_train, cv=tscv, scoring="neg_root_mean_squared_error"
-    )
+    scores = cross_val_score(model, X_train, y_train, cv=tscv, scoring="neg_root_mean_squared_error")
     return -scores.mean()
 
 
@@ -83,9 +79,7 @@ def _xgb_objective(trial, X_train, y_train):
     }
     model = xgb.XGBRegressor(**params, random_state=42, n_jobs=-1, verbosity=0)
     tscv = TimeSeriesSplit(n_splits=5)
-    scores = cross_val_score(
-        model, X_train, y_train, cv=tscv, scoring="neg_root_mean_squared_error"
-    )
+    scores = cross_val_score(model, X_train, y_train, cv=tscv, scoring="neg_root_mean_squared_error")
     return -scores.mean()
 
 
@@ -179,9 +173,7 @@ def train_with_optuna(
 def select_best_model(results: dict) -> str:
     """Select the best model based on test RMSE."""
     best_name = min(results, key=lambda k: results[k]["metrics"]["rmse"])
-    logger.info(
-        "Best model: %s (RMSE=%.4f)", best_name, results[best_name]["metrics"]["rmse"]
-    )
+    logger.info("Best model: %s (RMSE=%.4f)", best_name, results[best_name]["metrics"]["rmse"])
     return best_name
 
 
@@ -227,9 +219,7 @@ def run_training(config_path: str = "configs/config.yaml"):
 
     # --- Data prep ---
     train_df, test_df = run_preprocessing(config_path)
-    train_df, test_df, encoders, scaler = run_feature_engineering(
-        train_df, test_df, config
-    )
+    train_df, test_df, encoders, scaler = run_feature_engineering(train_df, test_df, config)
 
     target = config["data"]["target_column"]
     feature_cols = get_feature_columns(train_df, target)
@@ -247,9 +237,7 @@ def run_training(config_path: str = "configs/config.yaml"):
     )
 
     # Save feature column names for inference
-    joblib.dump(
-        feature_cols, Path(config["data"]["processed_dir"]) / "feature_cols.joblib"
-    )
+    joblib.dump(feature_cols, Path(config["data"]["processed_dir"]) / "feature_cols.joblib")
 
     # --- Train models ---
     results = {}
@@ -261,9 +249,7 @@ def run_training(config_path: str = "configs/config.yaml"):
 
     # Optimized models
     for model_name in ["random_forest", "xgboost"]:
-        model, metrics, params = train_with_optuna(
-            model_name, X_train, y_train, X_test, y_test, n_trials=n_trials
-        )
+        model, metrics, params = train_with_optuna(model_name, X_train, y_train, X_test, y_test, n_trials=n_trials)
         results[model_name] = {"model": model, "metrics": metrics, "params": params}
 
     # --- Select & save best model ---
@@ -279,9 +265,7 @@ def run_training(config_path: str = "configs/config.yaml"):
     for name, res in results.items():
         m = res["metrics"]
         marker = " ★" if name == best_name else ""
-        print(
-            f"{name:<20} {m['rmse']:>10.2f} {m['mae']:>10.2f} {m['r2']:>10.4f} {m['mape']:>9.2f}%{marker}"
-        )
+        print(f"{name:<20} {m['rmse']:>10.2f} {m['mae']:>10.2f} {m['r2']:>10.4f} {m['mape']:>9.2f}%{marker}")
     print("=" * 70)
 
     return results, best_name

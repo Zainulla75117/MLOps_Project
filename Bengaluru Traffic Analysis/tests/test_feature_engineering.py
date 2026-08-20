@@ -127,25 +127,19 @@ class TestExtractTimeFeatures:
 
 class TestLagFeatures:
     def test_creates_lag_columns(self, sample_df):
-        result = create_lag_features(
-            sample_df, "Traffic Volume", "Road/Intersection Name", [1, 3]
-        )
+        result = create_lag_features(sample_df, "Traffic Volume", "Road/Intersection Name", [1, 3])
         assert "Traffic Volume_lag_1" in result.columns
         assert "Traffic Volume_lag_3" in result.columns
 
     def test_lag_1_has_nan(self, sample_df):
-        result = create_lag_features(
-            sample_df, "Traffic Volume", "Road/Intersection Name", [1]
-        )
+        result = create_lag_features(sample_df, "Traffic Volume", "Road/Intersection Name", [1])
         # First row per group should have NaN
         assert result["Traffic Volume_lag_1"].isna().any()
 
 
 class TestRollingFeatures:
     def test_creates_rolling_columns(self, sample_df):
-        result = create_rolling_features(
-            sample_df, "Traffic Volume", "Road/Intersection Name", [3]
-        )
+        result = create_rolling_features(sample_df, "Traffic Volume", "Road/Intersection Name", [3])
         assert "Traffic Volume_rolling_mean_3" in result.columns
         assert "Traffic Volume_rolling_std_3" in result.columns
 
@@ -159,33 +153,23 @@ class TestInteractionFeatures:
 
     def test_interaction_values(self, sample_df):
         result = create_interaction_features(sample_df)
-        expected = (
-            sample_df["Congestion Level"] * sample_df["Road Capacity Utilization"]
-        )
-        pd.testing.assert_series_equal(
-            result["congestion_x_capacity"], expected, check_names=False
-        )
+        expected = sample_df["Congestion Level"] * sample_df["Road Capacity Utilization"]
+        pd.testing.assert_series_equal(result["congestion_x_capacity"], expected, check_names=False)
 
 
 class TestEncodeCategorical:
     def test_encodes_area_name(self, sample_df, sample_config):
-        result, encoders = encode_categorical_features(
-            sample_df, sample_config, fit=True
-        )
+        result, encoders = encode_categorical_features(sample_df, sample_config, fit=True)
         assert result["Area Name"].dtype in [np.int32, np.int64, int]
         assert "Area Name" in encoders
 
     def test_one_hot_encodes_weather(self, sample_df, sample_config):
-        result, encoders = encode_categorical_features(
-            sample_df, sample_config, fit=True
-        )
+        result, encoders = encode_categorical_features(sample_df, sample_config, fit=True)
         assert "Weather Conditions" not in result.columns
         weather_cols = [c for c in result.columns if c.startswith("weather_")]
         assert len(weather_cols) > 0
 
     def test_transform_mode(self, sample_df, sample_config):
         _, encoders = encode_categorical_features(sample_df, sample_config, fit=True)
-        result, _ = encode_categorical_features(
-            sample_df, sample_config, encoders=encoders, fit=False
-        )
+        result, _ = encode_categorical_features(sample_df, sample_config, encoders=encoders, fit=False)
         assert "Weather Conditions" not in result.columns

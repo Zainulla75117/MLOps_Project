@@ -35,15 +35,11 @@ def extract_time_features(df: pd.DataFrame) -> pd.DataFrame:
     df["quarter"] = df["Date"].dt.quarter
     df["week_of_year"] = df["Date"].dt.isocalendar().week.astype(int)
 
-    logger.info(
-        "Extracted time features: year, month, day_of_week, day_of_month, is_weekend, quarter, week_of_year"
-    )
+    logger.info("Extracted time features: year, month, day_of_week, day_of_month, is_weekend, quarter, week_of_year")
     return df
 
 
-def create_lag_features(
-    df: pd.DataFrame, target_col: str, group_col: str, lag_periods: list[int]
-) -> pd.DataFrame:
+def create_lag_features(df: pd.DataFrame, target_col: str, group_col: str, lag_periods: list[int]) -> pd.DataFrame:
     """
     Create lag features for the target variable, grouped by road/intersection.
     """
@@ -58,9 +54,7 @@ def create_lag_features(
     return df
 
 
-def create_rolling_features(
-    df: pd.DataFrame, target_col: str, group_col: str, windows: list[int]
-) -> pd.DataFrame:
+def create_rolling_features(df: pd.DataFrame, target_col: str, group_col: str, windows: list[int]) -> pd.DataFrame:
     """
     Create rolling mean and std features for the target variable.
     """
@@ -88,9 +82,7 @@ def create_interaction_features(df: pd.DataFrame) -> pd.DataFrame:
 
     # Congestion × Road Capacity interaction
     if "Congestion Level" in df.columns and "Road Capacity Utilization" in df.columns:
-        df["congestion_x_capacity"] = (
-            df["Congestion Level"] * df["Road Capacity Utilization"]
-        )
+        df["congestion_x_capacity"] = df["Congestion Level"] * df["Road Capacity Utilization"]
 
     # Speed × Travel Time interaction
     if "Average Speed" in df.columns and "Travel Time Index" in df.columns:
@@ -129,11 +121,7 @@ def encode_categorical_features(
             else:
                 le = encoders[col]
                 # Handle unseen labels gracefully
-                df[col] = df[col].map(
-                    lambda x, _le=le: (
-                        _le.transform([x])[0] if x in _le.classes_ else -1
-                    )
-                )
+                df[col] = df[col].map(lambda x, _le=le: (_le.transform([x])[0] if x in _le.classes_ else -1))
             logger.info("Label-encoded: %s", col)
 
     # One-hot encode Weather Conditions
@@ -230,9 +218,7 @@ def run_feature_engineering(
 
     # --- Encode categoricals ---
     train_df, encoders = encode_categorical_features(train_df, config, fit=True)
-    test_df, _ = encode_categorical_features(
-        test_df, config, encoders=encoders, fit=False
-    )
+    test_df, _ = encode_categorical_features(test_df, config, encoders=encoders, fit=False)
 
     # --- Fill NaN from lag/rolling with 0 ---
     train_df.fillna(0, inplace=True)
@@ -240,11 +226,7 @@ def run_feature_engineering(
 
     # --- Scale numeric features ---
     feature_cols = get_feature_columns(train_df, target)
-    numeric_cols = [
-        c
-        for c in feature_cols
-        if train_df[c].dtype in [np.float64, np.int64, np.float32, np.int32]
-    ]
+    numeric_cols = [c for c in feature_cols if train_df[c].dtype in [np.float64, np.int64, np.float32, np.int32]]
     train_df, scaler = scale_numeric_features(train_df, numeric_cols, fit=True)
     test_df, _ = scale_numeric_features(test_df, numeric_cols, scaler=scaler, fit=False)
 
@@ -261,11 +243,7 @@ if __name__ == "__main__":
 
     config = load_config()
     train_df, test_df = run_preprocessing()
-    train_df, test_df, encoders, scaler = run_feature_engineering(
-        train_df, test_df, config
-    )
+    train_df, test_df, encoders, scaler = run_feature_engineering(train_df, test_df, config)
     print(f"Final train shape: {train_df.shape}")
     print(f"Final test shape: {test_df.shape}")
-    print(
-        f"Feature columns: {get_feature_columns(train_df, config['data']['target_column'])}"
-    )
+    print(f"Feature columns: {get_feature_columns(train_df, config['data']['target_column'])}")

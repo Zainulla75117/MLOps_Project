@@ -73,9 +73,7 @@ class TestCleanData:
             "int64",
             "int32",
         ]
-        assert set(result["Roadwork and Construction Activity"].unique()).issubset(
-            {0, 1}
-        )
+        assert set(result["Roadwork and Construction Activity"].unique()).issubset({0, 1})
 
     def test_parses_date(self, sample_df, sample_config):
         """Date column should be datetime."""
