@@ -7,10 +7,8 @@ Handles loading, cleaning, and splitting the Bengaluru traffic dataset.
 import logging
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import yaml
-from sklearn.model_selection import train_test_split
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +75,6 @@ def split_data(
     Sorts by date, then splits to avoid data leakage from future dates.
     """
     test_size = config["data"].get("test_size", 0.2)
-    random_state = config["data"].get("random_state", 42)
 
     # Sort by date for time-series integrity
     df = df.sort_values("Date").reset_index(drop=True)

@@ -13,8 +13,6 @@ import mlflow.sklearn
 import mlflow.xgboost
 import numpy as np
 import optuna
-import pandas as pd
-import yaml
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -85,8 +83,6 @@ def _xgb_objective(trial, X_train, y_train):
         model, X_train, y_train, cv=tscv, scoring="neg_root_mean_squared_error"
     )
     return -scores.mean()
-
-
 
 
 # ===========================================================================

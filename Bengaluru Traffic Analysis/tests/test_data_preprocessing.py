@@ -2,13 +2,10 @@
 Tests for data_preprocessing module.
 """
 
-import os
-import tempfile
-
 import pandas as pd
 import pytest
 
-from src.data_preprocessing import clean_data, load_config, load_raw_data, split_data
+from src.data_preprocessing import clean_data, split_data
 
 
 @pytest.fixture

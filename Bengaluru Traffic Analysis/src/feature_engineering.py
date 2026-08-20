@@ -264,7 +264,7 @@ def run_feature_engineering(
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    from src.data_preprocessing import load_config, run_preprocessing
+    from src.data_preprocessing import run_preprocessing
 
     config = load_config()
     train_df, test_df = run_preprocessing()

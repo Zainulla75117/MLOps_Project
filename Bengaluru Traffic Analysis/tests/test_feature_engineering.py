@@ -29,7 +29,10 @@ def sample_df():
             "Congestion Level": [90, 80, 60, 100, 95, 70, 85, 65, 98, 88],
             "Road Capacity Utilization": [95, 85, 70, 100, 90, 75, 88, 68, 97, 85],
             "Incident Reports": [2, 1, 0, 3, 1, 0, 2, 1, 3, 2],
-            "Weather Conditions": ["Clear", "Rain", "Clear", "Fog", "Overcast", "Clear", "Rain", "Clear", "Fog", "Clear"],
+            "Weather Conditions": [
+                "Clear", "Rain", "Clear", "Fog", "Overcast",
+                "Clear", "Rain", "Clear", "Fog", "Clear",
+            ],
             "Roadwork and Construction Activity": [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
             "Public Transport Usage": [45, 50, 55, 60, 48, 42, 52, 58, 62, 46],
             "Traffic Signal Compliance": [85, 90, 92, 78, 82, 88, 91, 94, 76, 84],

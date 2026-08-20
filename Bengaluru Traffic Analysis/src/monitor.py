@@ -14,7 +14,6 @@ from evidently import ColumnMapping
 from evidently.report import Report
 from evidently.metric_preset import DataDriftPreset, DataQualityPreset
 from evidently.metrics import (
-    DataDriftTable,
     DatasetDriftMetric,
 )
 from evidently.test_suite import TestSuite

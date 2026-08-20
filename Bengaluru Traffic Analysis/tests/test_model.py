@@ -3,7 +3,6 @@ Tests for the FastAPI prediction service.
 """
 
 import pytest
-from fastapi.testclient import TestClient
 
 
 @pytest.fixture

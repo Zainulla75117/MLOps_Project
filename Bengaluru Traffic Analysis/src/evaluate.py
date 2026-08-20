@@ -10,10 +10,9 @@ from pathlib import Path
 import joblib
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 logger = logging.getLogger(__name__)
@@ -185,7 +184,7 @@ if __name__ == "__main__":
     feature_cols = joblib.load(
         Path(config["data"]["processed_dir"]) / "feature_cols.joblib"
     )
-    
+
     train_df, test_df = run_preprocessing("configs/config.yaml")
     train_df, test_df, encoders, scaler = run_feature_engineering(
         train_df, test_df, config

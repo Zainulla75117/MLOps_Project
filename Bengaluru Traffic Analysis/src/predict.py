@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import yaml
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
@@ -105,8 +106,6 @@ async def lifespan(app: FastAPI):
 # FastAPI App
 # ===========================================================================
 
-from fastapi.middleware.cors import CORSMiddleware
-
 app = FastAPI(
     title="Bengaluru Traffic Volume Prediction API",
     description="Real-time traffic volume prediction for Bengaluru roads using ML",
@@ -121,6 +120,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 def _prepare_features(features: TrafficFeatures) -> np.ndarray:
     """
@@ -244,6 +244,7 @@ async def model_info():
         "n_features": len(state.feature_cols) if state.feature_cols else 0,
         "feature_names": state.feature_cols,
     }
+
 
 @app.get("/cors-test")
 async def cors_test():
