@@ -11,9 +11,9 @@ import joblib
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np
-import pandas as pd
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
