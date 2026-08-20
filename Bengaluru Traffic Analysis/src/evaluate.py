@@ -14,7 +14,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-from sklearn.metrics import (
+from sklearn.metrics import (  # noqa: E402
     mean_absolute_error,
     mean_squared_error,
     r2_score,
