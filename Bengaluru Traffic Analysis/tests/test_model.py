@@ -32,10 +32,19 @@ class TestPredictionSchema:
     def test_valid_payload_structure(self, sample_prediction_payload):
         """Valid payload should have all required fields."""
         required_fields = [
-            "date", "area_name", "road_name", "average_speed",
-            "travel_time_index", "congestion_level", "road_capacity_utilization",
-            "incident_reports", "public_transport_usage", "traffic_signal_compliance",
-            "parking_usage", "pedestrian_cyclist_count", "weather_conditions",
+            "date",
+            "area_name",
+            "road_name",
+            "average_speed",
+            "travel_time_index",
+            "congestion_level",
+            "road_capacity_utilization",
+            "incident_reports",
+            "public_transport_usage",
+            "traffic_signal_compliance",
+            "parking_usage",
+            "pedestrian_cyclist_count",
+            "weather_conditions",
             "roadwork_activity",
         ]
         for field in required_fields:

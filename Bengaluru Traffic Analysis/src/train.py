@@ -35,6 +35,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 # Metrics
 # ===========================================================================
 
+
 def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
     """Compute regression metrics."""
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
@@ -48,6 +49,7 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
 # Optuna Objective Functions
 # ===========================================================================
 
+
 def _rf_objective(trial, X_train, y_train):
     """Optuna objective for Random Forest."""
     params = {
@@ -55,7 +57,9 @@ def _rf_objective(trial, X_train, y_train):
         "max_depth": trial.suggest_int("max_depth", 5, 30),
         "min_samples_split": trial.suggest_int("min_samples_split", 2, 20),
         "min_samples_leaf": trial.suggest_int("min_samples_leaf", 1, 10),
-        "max_features": trial.suggest_categorical("max_features", ["sqrt", "log2", None]),
+        "max_features": trial.suggest_categorical(
+            "max_features", ["sqrt", "log2", None]
+        ),
     }
     model = RandomForestRegressor(**params, random_state=42, n_jobs=-1)
     tscv = TimeSeriesSplit(n_splits=5)
@@ -88,6 +92,7 @@ def _xgb_objective(trial, X_train, y_train):
 # ===========================================================================
 # Training Functions
 # ===========================================================================
+
 
 def train_baseline(X_train, y_train, X_test, y_test):
     """Train Linear Regression baseline."""
@@ -174,7 +179,9 @@ def train_with_optuna(
 def select_best_model(results: dict) -> str:
     """Select the best model based on test RMSE."""
     best_name = min(results, key=lambda k: results[k]["metrics"]["rmse"])
-    logger.info("Best model: %s (RMSE=%.4f)", best_name, results[best_name]["metrics"]["rmse"])
+    logger.info(
+        "Best model: %s (RMSE=%.4f)", best_name, results[best_name]["metrics"]["rmse"]
+    )
     return best_name
 
 
@@ -207,6 +214,7 @@ def register_best_model(model_name: str, run_id: str, config: dict):
 # Main Training Pipeline
 # ===========================================================================
 
+
 def run_training(config_path: str = "configs/config.yaml"):
     """Execute the full training pipeline."""
     logging.basicConfig(level=logging.INFO)
@@ -231,10 +239,17 @@ def run_training(config_path: str = "configs/config.yaml"):
     X_test = np.ascontiguousarray(test_df[feature_cols].values, dtype=np.float32)
     y_test = np.ascontiguousarray(test_df[target].values, dtype=np.float32)
 
-    logger.info("Features: %d, Train: %d, Test: %d", len(feature_cols), len(X_train), len(X_test))
+    logger.info(
+        "Features: %d, Train: %d, Test: %d",
+        len(feature_cols),
+        len(X_train),
+        len(X_test),
+    )
 
     # Save feature column names for inference
-    joblib.dump(feature_cols, Path(config["data"]["processed_dir"]) / "feature_cols.joblib")
+    joblib.dump(
+        feature_cols, Path(config["data"]["processed_dir"]) / "feature_cols.joblib"
+    )
 
     # --- Train models ---
     results = {}
@@ -264,7 +279,9 @@ def run_training(config_path: str = "configs/config.yaml"):
     for name, res in results.items():
         m = res["metrics"]
         marker = " ★" if name == best_name else ""
-        print(f"{name:<20} {m['rmse']:>10.2f} {m['mae']:>10.2f} {m['r2']:>10.4f} {m['mape']:>9.2f}%{marker}")
+        print(
+            f"{name:<20} {m['rmse']:>10.2f} {m['mae']:>10.2f} {m['r2']:>10.4f} {m['mape']:>9.2f}%{marker}"
+        )
     print("=" * 70)
 
     return results, best_name

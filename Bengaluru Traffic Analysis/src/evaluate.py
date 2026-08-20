@@ -9,11 +9,16 @@ from pathlib import Path
 
 import joblib
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score  # noqa: E402
+from sklearn.metrics import (
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score,
+)  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +40,9 @@ def plot_predictions_vs_actual(
     ax.scatter(y_true, y_pred, alpha=0.3, s=10)
     min_val = min(y_true.min(), y_pred.min())
     max_val = max(y_true.max(), y_pred.max())
-    ax.plot([min_val, max_val], [min_val, max_val], "r--", lw=2, label="Perfect Prediction")
+    ax.plot(
+        [min_val, max_val], [min_val, max_val], "r--", lw=2, label="Perfect Prediction"
+    )
     ax.set_xlabel("Actual Traffic Volume")
     ax.set_ylabel("Predicted Traffic Volume")
     ax.set_title(title)
@@ -146,17 +153,20 @@ def run_evaluation(
 
     # Generate plots
     plot_predictions_vs_actual(
-        y_test, y_pred,
+        y_test,
+        y_pred,
         f"{model_name} — Predictions vs Actual",
         str(output_path / f"{model_name}_predictions.png"),
     )
     plot_residuals(
-        y_test, y_pred,
+        y_test,
+        y_pred,
         model_name,
         str(output_path / f"{model_name}_residuals.png"),
     )
     plot_feature_importance(
-        model, feature_names,
+        model,
+        feature_names,
         f"{model_name} — Feature Importance",
         str(output_path / f"{model_name}_feature_importance.png"),
     )

@@ -31,7 +31,13 @@ def sample_df():
     """Create a sample DataFrame matching the dataset schema."""
     return pd.DataFrame(
         {
-            "Date": ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
+            "Date": [
+                "2024-01-01",
+                "2024-01-02",
+                "2024-01-03",
+                "2024-01-04",
+                "2024-01-05",
+            ],
             "Area Name": ["Koramangala"] * 3 + ["Indiranagar"] * 2,
             "Road/Intersection Name": ["Sarjapur Road"] * 3 + ["100 Feet Road"] * 2,
             "Traffic Volume": [30000, 35000, 28000, 42000, 38000],
@@ -62,8 +68,14 @@ class TestCleanData:
     def test_encodes_binary_columns(self, sample_df, sample_config):
         """Roadwork and Construction Activity should be 0/1."""
         result = clean_data(sample_df, sample_config)
-        assert result["Roadwork and Construction Activity"].dtype in [int, "int64", "int32"]
-        assert set(result["Roadwork and Construction Activity"].unique()).issubset({0, 1})
+        assert result["Roadwork and Construction Activity"].dtype in [
+            int,
+            "int64",
+            "int32",
+        ]
+        assert set(result["Roadwork and Construction Activity"].unique()).issubset(
+            {0, 1}
+        )
 
     def test_parses_date(self, sample_df, sample_config):
         """Date column should be datetime."""

@@ -77,10 +77,12 @@ def generate_drift_report(
     column_mapping = get_column_mapping(config)
 
     # --- Drift Report ---
-    drift_report = Report(metrics=[
-        DatasetDriftMetric(),
-        DataDriftPreset(),
-    ])
+    drift_report = Report(
+        metrics=[
+            DatasetDriftMetric(),
+            DataDriftPreset(),
+        ]
+    )
     drift_report.run(
         reference_data=reference_data,
         current_data=current_data,
@@ -135,13 +137,15 @@ def run_drift_tests(
     drift_threshold = config["monitoring"].get("drift_threshold", 0.05)
 
     # --- Test Suite ---
-    test_suite = TestSuite(tests=[
-        TestNumberOfDrifted(lt=5),
-        TestShareOfDrifted(lt=drift_threshold),
-        TestColumnDrift(column_name="Average Speed"),
-        TestColumnDrift(column_name="Congestion Level"),
-        TestColumnDrift(column_name="Traffic Volume"),
-    ])
+    test_suite = TestSuite(
+        tests=[
+            TestNumberOfDrifted(lt=5),
+            TestShareOfDrifted(lt=drift_threshold),
+            TestColumnDrift(column_name="Average Speed"),
+            TestColumnDrift(column_name="Congestion Level"),
+            TestColumnDrift(column_name="Traffic Volume"),
+        ]
+    )
 
     test_suite.run(
         reference_data=reference_data,
@@ -224,9 +228,7 @@ def run_monitoring(config_path: str = "configs/config.yaml"):
     print(f"Quality Report: {quality_path}")
 
     if drift_result["dataset_drift_detected"]:
-        logger.warning(
-            "⚠️ DATASET DRIFT DETECTED — consider retraining the model!"
-        )
+        logger.warning("⚠️ DATASET DRIFT DETECTED — consider retraining the model!")
 
     return drift_result, test_result
 

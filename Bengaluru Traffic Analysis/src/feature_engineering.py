@@ -35,7 +35,9 @@ def extract_time_features(df: pd.DataFrame) -> pd.DataFrame:
     df["quarter"] = df["Date"].dt.quarter
     df["week_of_year"] = df["Date"].dt.isocalendar().week.astype(int)
 
-    logger.info("Extracted time features: year, month, day_of_week, day_of_month, is_weekend, quarter, week_of_year")
+    logger.info(
+        "Extracted time features: year, month, day_of_week, day_of_month, is_weekend, quarter, week_of_year"
+    )
     return df
 
 
@@ -69,13 +71,11 @@ def create_rolling_features(
         mean_col = f"{target_col}_rolling_mean_{window}"
         std_col = f"{target_col}_rolling_std_{window}"
 
-        df[mean_col] = (
-            df.groupby(group_col)[target_col]
-            .transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
+        df[mean_col] = df.groupby(group_col)[target_col].transform(
+            lambda x: x.shift(1).rolling(window, min_periods=1).mean()
         )
-        df[std_col] = (
-            df.groupby(group_col)[target_col]
-            .transform(lambda x: x.shift(1).rolling(window, min_periods=1).std())
+        df[std_col] = df.groupby(group_col)[target_col].transform(
+            lambda x: x.shift(1).rolling(window, min_periods=1).std()
         )
         logger.info("Created rolling features: %s, %s", mean_col, std_col)
 
@@ -98,9 +98,7 @@ def create_interaction_features(df: pd.DataFrame) -> pd.DataFrame:
 
     # Incident density (incidents relative to congestion)
     if "Incident Reports" in df.columns and "Congestion Level" in df.columns:
-        df["incident_density"] = df["Incident Reports"] / (
-            df["Congestion Level"] + 1
-        )
+        df["incident_density"] = df["Incident Reports"] / (df["Congestion Level"] + 1)
 
     logger.info("Created interaction features")
     return df
@@ -143,20 +141,14 @@ def encode_categorical_features(
         if fit:
             ohe = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
             weather_encoded = ohe.fit_transform(df[["Weather Conditions"]])
-            weather_cols = [
-                f"weather_{cat}" for cat in ohe.categories_[0]
-            ]
+            weather_cols = [f"weather_{cat}" for cat in ohe.categories_[0]]
             encoders["Weather Conditions"] = ohe
         else:
             ohe = encoders["Weather Conditions"]
             weather_encoded = ohe.transform(df[["Weather Conditions"]])
-            weather_cols = [
-                f"weather_{cat}" for cat in ohe.categories_[0]
-            ]
+            weather_cols = [f"weather_{cat}" for cat in ohe.categories_[0]]
 
-        weather_df = pd.DataFrame(
-            weather_encoded, columns=weather_cols, index=df.index
-        )
+        weather_df = pd.DataFrame(weather_encoded, columns=weather_cols, index=df.index)
         df = pd.concat([df.drop(columns=["Weather Conditions"]), weather_df], axis=1)
         logger.info("One-hot encoded: Weather Conditions → %s", weather_cols)
 
@@ -249,7 +241,8 @@ def run_feature_engineering(
     # --- Scale numeric features ---
     feature_cols = get_feature_columns(train_df, target)
     numeric_cols = [
-        c for c in feature_cols
+        c
+        for c in feature_cols
         if train_df[c].dtype in [np.float64, np.int64, np.float32, np.int32]
     ]
     train_df, scaler = scale_numeric_features(train_df, numeric_cols, fit=True)
@@ -273,4 +266,6 @@ if __name__ == "__main__":
     )
     print(f"Final train shape: {train_df.shape}")
     print(f"Final test shape: {test_df.shape}")
-    print(f"Feature columns: {get_feature_columns(train_df, config['data']['target_column'])}")
+    print(
+        f"Feature columns: {get_feature_columns(train_df, config['data']['target_column'])}"
+    )

@@ -67,9 +67,7 @@ def clean_data(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     return df
 
 
-def split_data(
-    df: pd.DataFrame, config: dict
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+def split_data(df: pd.DataFrame, config: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Time-aware train/test split.
     Sorts by date, then splits to avoid data leakage from future dates.
@@ -84,9 +82,7 @@ def split_data(
     train_df = df.iloc[:split_idx].copy()
     test_df = df.iloc[split_idx:].copy()
 
-    logger.info(
-        "Split data: train=%d rows, test=%d rows", len(train_df), len(test_df)
-    )
+    logger.info("Split data: train=%d rows, test=%d rows", len(train_df), len(test_df))
     return train_df, test_df
 
 
@@ -105,7 +101,9 @@ def save_processed_data(
     logger.info("Saved processed data to %s", output_path)
 
 
-def run_preprocessing(config_path: str = "configs/config.yaml") -> tuple[pd.DataFrame, pd.DataFrame]:
+def run_preprocessing(
+    config_path: str = "configs/config.yaml",
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Execute the full preprocessing pipeline."""
     logging.basicConfig(level=logging.INFO)
 
