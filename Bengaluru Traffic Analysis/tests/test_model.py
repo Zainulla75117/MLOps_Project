@@ -65,6 +65,7 @@ class TestMetrics:
 
     def test_metrics_computation(self):
         import numpy as np
+
         from src.evaluate import compute_metrics
 
         y_true = np.array([100, 200, 300, 400, 500])
@@ -83,6 +84,7 @@ class TestMetrics:
 
     def test_perfect_predictions(self):
         import numpy as np
+
         from src.evaluate import compute_metrics
 
         y_true = np.array([100, 200, 300])

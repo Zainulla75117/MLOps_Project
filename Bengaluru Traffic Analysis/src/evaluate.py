@@ -18,7 +18,7 @@ from sklearn.metrics import (  # noqa: E402
     mean_absolute_error,
     mean_squared_error,
     r2_score,
-)  # noqa: E402
+)
 
 logger = logging.getLogger(__name__)
 
@@ -184,6 +184,7 @@ def run_evaluation(
 if __name__ == "__main__":
     # Quick standalone evaluation of saved model
     import yaml
+
     from src.data_preprocessing import run_preprocessing
     from src.feature_engineering import run_feature_engineering
 

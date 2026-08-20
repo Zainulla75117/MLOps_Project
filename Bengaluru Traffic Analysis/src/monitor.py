@@ -11,16 +11,16 @@ from pathlib import Path
 import pandas as pd
 import yaml
 from evidently import ColumnMapping
-from evidently.report import Report
 from evidently.metric_preset import DataDriftPreset, DataQualityPreset
 from evidently.metrics import (
     DatasetDriftMetric,
 )
+from evidently.report import Report
 from evidently.test_suite import TestSuite
 from evidently.tests import (
+    TestColumnDrift,
     TestNumberOfDrifted,
     TestShareOfDrifted,
-    TestColumnDrift,
 )
 
 logger = logging.getLogger(__name__)

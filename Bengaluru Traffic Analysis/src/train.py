@@ -8,17 +8,17 @@ and Optuna hyperparameter optimization.
 import logging
 from pathlib import Path
 
+import joblib
 import mlflow
 import mlflow.sklearn
 import mlflow.xgboost
 import numpy as np
 import optuna
+import xgboost as xgb
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import cross_val_score, TimeSeriesSplit
-import xgboost as xgb
-import joblib
+from sklearn.model_selection import TimeSeriesSplit, cross_val_score
 
 from src.data_preprocessing import load_config, run_preprocessing
 from src.feature_engineering import (
