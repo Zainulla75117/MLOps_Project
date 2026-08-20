@@ -11,7 +11,7 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  TF_WORKING_DIR: './Bengaluru Traffic Analysis/terraform'
+  TF_WORKING_DIR: './Infrastructure/terraform'
 
 jobs:
   terraform-destroy:
