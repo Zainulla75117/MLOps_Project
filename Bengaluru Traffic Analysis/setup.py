@@ -13,7 +13,7 @@ setup(
         "xgboost>=2.0.0",
         "lightgbm>=4.0.0",
         "optuna>=3.4.0",
-        "mlflow>=2.9.0",
+        "mlflow>=3.15.1",
         "fastapi>=0.104.0",
         "uvicorn[standard]>=0.24.0",
         "pydantic>=2.5.0",

@@ -103,7 +103,7 @@ def train_baseline(X_train, y_train, X_test, y_test):
             mlflow.log_metric(f"test_{k}", v)
         for k, v in train_metrics.items():
             mlflow.log_metric(f"train_{k}", v)
-        mlflow.sklearn.log_model(model, "model")
+        mlflow.sklearn.log_model(model, name="model")
 
     logger.info("Baseline test metrics: %s", test_metrics)
     return model, test_metrics
@@ -162,9 +162,9 @@ def train_with_optuna(
 
         # Log model with the appropriate flavor
         if model_name == "xgboost":
-            mlflow.xgboost.log_model(model, "model")
+            mlflow.xgboost.log_model(model, name="model")
         else:
-            mlflow.sklearn.log_model(model, "model")
+            mlflow.sklearn.log_model(model, name="model")
 
     logger.info("%s test metrics: %s", model_name, test_metrics)
     return model, test_metrics, best_params

@@ -7,7 +7,7 @@ lightgbm>=4.0.0
 optuna>=3.4.0
 
 # Experiment Tracking
-mlflow>=2.9.0
+mlflow>=3.15.1
 boto3>=1.29.0
 
 # API Serving
