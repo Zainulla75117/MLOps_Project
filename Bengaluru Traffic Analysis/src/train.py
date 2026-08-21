@@ -6,6 +6,7 @@ and Optuna hyperparameter optimization.
 """
 
 import logging
+import os
 from pathlib import Path
 
 import joblib
@@ -214,7 +215,8 @@ def run_training(config_path: str = "configs/config.yaml"):
     config = load_config(config_path)
 
     # Setup MLflow
-    mlflow.set_tracking_uri(config["mlflow"]["tracking_uri"])
+    tracking_uri = os.environ.get("MLFLOW_TRACKING_URI", config["mlflow"]["tracking_uri"])
+    mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment(config["mlflow"]["experiment_name"])
 
     # --- Data prep ---
